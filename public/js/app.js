@@ -22,3 +22,20 @@ async function editUrl(enc) {
 }
 document.querySelectorAll('.btn-del').forEach(b=>b.addEventListener('click',()=>delUrl(b.dataset.url)));
 document.querySelectorAll('.btn-edit').forEach(b=>b.addEventListener('click',()=>editUrl(b.dataset.url)));
+
+const pollInterval = parseInt(document.getElementById('config').dataset.interval) * 1000;
+setInterval(async () => {
+  const r = await fetch('/api/stats');
+  if (!r.ok) return;
+  const s = await r.json();
+  document.getElementById('last-checked').textContent = s.lastChecked;
+  const badge = document.getElementById('status-badge');
+  const cls = s.overallStatus === 'ALL UP' ? 'up' : s.overallStatus === 'ALL DOWN' ? 'down' : 'warning';
+  badge.textContent = s.overallStatus;
+  badge.className = 'status-badge status-' + cls;
+  document.getElementById('stat-total').textContent = s.global.totalMins;
+  document.getElementById('stat-up').textContent = s.global.upMins;
+  document.getElementById('stat-down').textContent = s.global.downMins;
+  document.getElementById('stat-unclear').textContent = s.global.unclearMins;
+  document.getElementById('stat-uptime').textContent = s.global.uptimePct;
+}, pollInterval);

@@ -353,6 +353,7 @@ function startServer() {
         .replace('{{UNCLEAR_MINS}}', String(stats.global.unclearMins))
         .replace('{{UPTIME_PCT}}', stats.global.uptimePct)
         .replace('{{URL_ROWS}}', urlRows)
+        .replace('{{POLL_INTERVAL}}', String(INTERVAL / 1000))
     );
   });
 
