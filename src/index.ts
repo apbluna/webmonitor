@@ -261,6 +261,13 @@ function startServer() {
     }
     const allUrls = readUrls();
     const perUrlCodes = stats.perUrlCodes || {};
+    const recentLogs: Record<string, LogEntry[]> = {};
+    try {
+      const logs = readLogs();
+      for (const url of allUrls) {
+        recentLogs[url] = logs.filter(l => l.url === url).slice(-10);
+      }
+    } catch {} // ignore if logs unavailable
     const urlRows = allUrls.length > 0
       ? allUrls.map(url => {
           const s = stats.perUrl[url];
@@ -305,6 +312,11 @@ function startServer() {
             }).join('');
             details = `<div class="codes-grid">${rows}</div>`;
           }
+          const logs = (recentLogs[url] || []).map(l => {
+            const cls = l.status === 'UP' ? 'up' : l.status === 'UNCLEAR' ? 'warning' : 'down';
+            return `<div class="log-row"><span class="log-ts">${l.ts}</span><span class="log-status label-${cls}">${l.status}</span><span class="log-code">${l.code}</span><span class="log-ms">${l.ms}ms</span></div>`;
+          }).join('');
+          const logSection = logs ? `<div class="log-grid">${logs}</div>` : '';
           return `<div class="url-card">
             <div class="url-header" onclick="this.parentElement.classList.toggle('open')">
               <span class="url-title">${url}</span>
@@ -313,6 +325,7 @@ function startServer() {
             </div>
             <div class="url-body">
               ${details}
+              ${logSection}
               <div class="url-actions"><button class="btn-edit" data-url="${enc}">Edit</button> <button class="btn-del" data-url="${enc}">Del</button></div>
             </div>
           </div>`;
