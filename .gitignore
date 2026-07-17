@@ -1,3 +1,6 @@
 node_modules/
 dist/
 uptime_logs.csv
+uptime_logs.json
+uptime_stats.json
+old_uptime_logs.csv

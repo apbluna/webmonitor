@@ -1,5 +1,5 @@
 import express from 'express';
-import { readFileSync, appendFileSync, existsSync, writeFileSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
@@ -8,11 +8,14 @@ puppeteer.use(StealthPlugin());
 
 const DATA_DIR = '/app/data';
 const URLS_FILE = join(DATA_DIR, 'urls.txt');
-const LOGS_FILE = join(DATA_DIR, 'uptime_logs.csv');
+const LOGS_FILE = join(DATA_DIR, 'uptime_logs.json');
 const STATS_FILE = join(DATA_DIR, 'uptime_stats.json');
 const INTERVAL = 60_000;
 const TIMEOUT = 30_000;
 const PORT = 3000;
+
+const USER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
 function readUrls(): string[] {
   if (!existsSync(URLS_FILE)) return [];
@@ -20,28 +23,6 @@ function readUrls(): string[] {
     .split('\n')
     .map(l => l.trim())
     .filter(l => l && !l.startsWith('#'));
-}
-
-function ensureHeader() {
-  if (!existsSync(LOGS_FILE)) {
-    appendFileSync(LOGS_FILE, 'Timestamp,URL,Status,HTTP Code,Response Time (ms)\n');
-    return;
-  }
-  const content = readFileSync(LOGS_FILE, 'utf-8');
-  const lines = content.split('\n').filter(Boolean);
-  if (lines.length === 0) {
-    appendFileSync(LOGS_FILE, 'Timestamp,URL,Status,HTTP Code,Response Time (ms)\n');
-    return;
-  }
-  if (lines[0] === 'Timestamp,URL,Status,HTTP Code') {
-    const newLines = ['Timestamp,URL,Status,HTTP Code,Response Time (ms)'];
-    for (let i = 1; i < lines.length; i++) newLines.push(lines[i] + ',');
-    writeFileSync(LOGS_FILE, newLines.join('\n') + '\n');
-  }
-}
-
-function appendLog(timestamp: string, url: string, status: string, httpCode: string, responseTime: string) {
-  appendFileSync(LOGS_FILE, `${timestamp},${url},${status},${httpCode},${responseTime}\n`);
 }
 
 interface LogEntry {
@@ -52,17 +33,21 @@ interface LogEntry {
   ms: string;
 }
 
+function ensureLogsFile() {
+  if (!existsSync(LOGS_FILE)) {
+    writeFileSync(LOGS_FILE, '[]');
+  }
+}
+
+function appendLog(entry: LogEntry) {
+  const logs: LogEntry[] = JSON.parse(readFileSync(LOGS_FILE, 'utf-8'));
+  logs.push(entry);
+  writeFileSync(LOGS_FILE, JSON.stringify(logs));
+}
+
 function readLogs(): LogEntry[] {
   if (!existsSync(LOGS_FILE)) return [];
-  const lines = readFileSync(LOGS_FILE, 'utf-8').split('\n').filter(Boolean);
-  const results: LogEntry[] = [];
-  for (let i = 1; i < lines.length; i++) {
-    const parts = lines[i].split(',');
-    if (parts.length >= 4) {
-      results.push({ ts: parts[0], url: parts[1], status: parts[2], code: parts[3], ms: parts[4] || '' });
-    }
-  }
-  return results;
+  return JSON.parse(readFileSync(LOGS_FILE, 'utf-8'));
 }
 
 interface Stats {
@@ -111,7 +96,12 @@ function computeStats(logs: LogEntry[]): Stats {
 
 async function checkUrl(browser: any, url: string): Promise<{ status: string; code: string; ms: number }> {
   const page = await browser.newPage();
+  await page.setUserAgent(USER_AGENT);
   await page.setViewport({ width: 1920, height: 1080 });
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+  });
   const start = Date.now();
   try {
     const resp = await page.goto(url, { waitUntil: 'networkidle0', timeout: TIMEOUT });
@@ -144,12 +134,13 @@ async function runCheck(urls: string[]) {
       args: [
         '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage',
         '--disable-gpu', '--window-size=1920,1080',
+        '--disable-blink-features=AutomationControlled',
       ],
     });
     for (const url of urls) {
       const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
       const result = await checkUrl(browser, url);
-      appendLog(timestamp, url, result.status, result.code, result.ms.toString());
+      appendLog({ ts: timestamp, url, status: result.status, code: result.code, ms: result.ms.toString() });
       console.log(`  ${result.status} ${result.code} ${result.ms}ms - ${url}`);
     }
   } catch (err) {
@@ -262,7 +253,7 @@ ${urlRows}
   app.listen(PORT, '0.0.0.0', () => console.log(`Web UI listening on port ${PORT}`));
 }
 
-ensureHeader();
+ensureLogsFile();
 const urls = readUrls();
 if (urls.length === 0) {
   console.error('No URLs found in ' + URLS_FILE);
