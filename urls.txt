@@ -1,3 +1,3 @@
-https://opac.filipinaslibrary.org.ph/
-https://www.filipinaslibrary.org.ph/
-https://guides.bloombergconnects.org/en-US/guide/filipinasHeritageLibrary
+https://example.com
+https://httpstat.us/200
+https://httpstat.us/503

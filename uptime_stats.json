@@ -1,78 +1,66 @@
 {
   "perUrl": {
-    "https://guides.bloombergconnects.org/en-US/guide/filipinasHeritageLibrary": {
-      "total": 113,
-      "up": 113,
+    "https://example.com": {
+      "total": 1000,
+      "up": 995,
+      "down": 5,
+      "unclear": 0,
+      "uptimePct": "99.50%"
+    },
+    "https://httpstat.us/200": {
+      "total": 1000,
+      "up": 1000,
       "down": 0,
       "unclear": 0,
       "uptimePct": "100.00%"
     },
-    "https://opac.filipinaslibrary.org.ph/": {
-      "total": 133424,
-      "up": 132733,
-      "down": 690,
-      "unclear": 1,
-      "uptimePct": "99.48%"
-    },
-    "https://www.filipinaslibrary.org.ph/": {
-      "total": 133424,
-      "up": 132734,
-      "down": 690,
+    "https://httpstat.us/503": {
+      "total": 1000,
+      "up": 0,
+      "down": 1000,
       "unclear": 0,
-      "uptimePct": "99.48%"
+      "uptimePct": "0.00%"
     }
   },
   "perUrlCodes": {
-    "https://guides.bloombergconnects.org/en-US/guide/filipinasHeritageLibrary": {
+    "https://example.com": {
       "200": [
         {
           "status": "UP",
-          "count": 113
+          "count": 995
+        }
+      ],
+      "503": [
+        {
+          "status": "DOWN",
+          "count": 5
         }
       ]
     },
-    "https://opac.filipinaslibrary.org.ph/": {
+    "https://httpstat.us/200": {
       "200": [
         {
           "status": "UP",
-          "count": 132733
-        }
-      ],
-      "502": [
-        {
-          "status": "DOWN",
-          "count": 690
-        }
-      ],
-      "Timeout": [
-        {
-          "status": "UNCLEAR",
-          "count": 1
+          "count": 1000
         }
       ]
     },
-    "https://www.filipinaslibrary.org.ph/": {
-      "200": [
-        {
-          "status": "UP",
-          "count": 132734
-        }
-      ],
-      "502": [
+    "https://httpstat.us/503": {
+      "503": [
         {
           "status": "DOWN",
-          "count": 690
+          "count": 1000
         }
       ]
     }
   },
   "global": {
-    "totalMins": 266960,
-    "upMins": 265580,
-    "downMins": 1380,
-    "unclearMins": 1,
-    "uptimePct": "99.48%"
+    "totalMins": 3000,
+    "upMins": 1995,
+    "downMins": 1005,
+    "unclearMins": 0,
+    "uptimePct": "66.50%"
   },
-  "lastChecked": "7/17/2026, 13:41:58",
+  "lastChecked": "2026-07-17 13:44:00",
   "overallStatus": "SOME DOWN"
 }
