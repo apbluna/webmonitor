@@ -1,0 +1,13 @@
+services:
+  uptime-monitor:
+    build: .
+    container_name: uptime-monitor
+    volumes:
+      - /opt/monitor:/app/data
+    networks:
+      - oneswim_net
+    restart: unless-stopped
+
+networks:
+  oneswim_net:
+    external: true

@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+RUN apk add --no-cache chromium
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+WORKDIR /app
+
+COPY package.json ./
+RUN npm install --omit=dev && npm cache clean --force
+
+COPY tsconfig.json ./
+COPY src/ ./src/
+RUN npx tsc && rm -rf src/ tsconfig.json
+
+RUN addgroup -S appuser && adduser -S -G appuser appuser && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
