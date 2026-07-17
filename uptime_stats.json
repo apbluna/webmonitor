@@ -1,0 +1,30 @@
+{
+  "perUrl": {
+    "https://opac.filipinaslibrary.org.ph/": {
+      "total": 4098,
+      "up": 4087,
+      "down": 11,
+      "uptimePct": "99.73%"
+    },
+    "https://www.filipinaslibrary.org.ph/": {
+      "total": 4094,
+      "up": 3926,
+      "down": 168,
+      "uptimePct": "95.90%"
+    },
+    "https://guides.bloombergconnects.org/en-US/guide/filipinasHeritageLibrary": {
+      "total": 11,
+      "up": 11,
+      "down": 0,
+      "uptimePct": "100.00%"
+    }
+  },
+  "global": {
+    "totalMins": 8203,
+    "upMins": 8024,
+    "downMins": 179,
+    "uptimePct": "97.82%"
+  },
+  "lastChecked": "7/17/2026, 10:15:41",
+  "overallStatus": "SOME DOWN"
+}
