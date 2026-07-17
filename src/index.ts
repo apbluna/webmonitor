@@ -273,16 +273,24 @@ function startServer() {
           const s = stats.perUrl[url];
           const codes = perUrlCodes[url];
           const enc = encodeURIComponent(url);
-          if (!s) return `<div class="url-card">
-            <div class="url-header" onclick="this.parentElement.classList.toggle('open')">
-              <span class="url-title">${url}</span>
-              <span class="url-summary">No data yet</span>
-              <span class="url-chevron">&#9654;</span>
-            </div>
-            <div class="url-body">
-              <div class="url-actions"><button class="btn-edit" data-url="${enc}">Edit</button> <button class="btn-del" data-url="${enc}">Del</button></div>
-            </div>
-          </div>`;
+          if (!s) {
+            const logs = (recentLogs[url] || []).map(l => {
+              const cls = l.status === 'UP' ? 'up' : l.status === 'UNCLEAR' ? 'warning' : 'down';
+              return `<div class="log-row"><span class="log-ts">${l.ts}</span><span class="log-status label-${cls}">${l.status}</span><span class="log-code">${l.code}</span><span class="log-ms">${l.ms}ms</span></div>`;
+            }).join('');
+            const logSection = logs ? `<div class="log-label">Last 10 checks</div><div class="log-grid"><div class="log-row log-header"><span class="log-ts">Timestamp</span><span class="log-status">Status</span><span class="log-code">Code</span><span class="log-ms">Resp.</span></div>${logs}</div>` : '';
+            return `<div class="url-card">
+              <div class="url-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="url-title">${url}</span>
+                <span class="url-summary">No data yet</span>
+                <span class="url-chevron">&#9654;</span>
+              </div>
+              <div class="url-body">
+                ${logSection}
+                <div class="url-actions"><button class="btn-edit" data-url="${enc}">Edit</button> <button class="btn-del" data-url="${enc}">Del</button></div>
+              </div>
+            </div>`;
+          }
           const pct = parseFloat(s.uptimePct);
           const cls = isNaN(pct) ? 'warning' : pct >= 99 ? 'up' : 'down';
           let details = '';
@@ -316,7 +324,8 @@ function startServer() {
             const cls = l.status === 'UP' ? 'up' : l.status === 'UNCLEAR' ? 'warning' : 'down';
             return `<div class="log-row"><span class="log-ts">${l.ts}</span><span class="log-status label-${cls}">${l.status}</span><span class="log-code">${l.code}</span><span class="log-ms">${l.ms}ms</span></div>`;
           }).join('');
-          const logSection = logs ? `<div class="log-grid">${logs}</div>` : '';
+          const logHeader = `<div class="log-row log-header"><span class="log-ts">Timestamp</span><span class="log-status">Status</span><span class="log-code">Code</span><span class="log-ms">Resp.</span></div>`;
+          const logSection = logs ? `<div class="log-label">Last 10 checks</div><div class="log-grid">${logHeader}${logs}</div>` : '';
           return `<div class="url-card">
             <div class="url-header" onclick="this.parentElement.classList.toggle('open')">
               <span class="url-title">${url}</span>
