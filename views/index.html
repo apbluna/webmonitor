@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uptime Monitor</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<h1>Uptime Monitor</h1>
+<p style="color:#64748b">Last checked: {{LAST_CHECKED}} &middot; <span class="status-badge status-{{STATUS_CLASS}}">{{OVERALL_STATUS}}</span></p>
+<div class="stats">
+  <div class="card"><div class="val">{{TOTAL_MINS}}</div><div class="lbl">Total Checks</div></div>
+  <div class="card"><div class="val" style="color:#4ade80">{{UP_MINS}}</div><div class="lbl">UP</div></div>
+  <div class="card"><div class="val" style="color:#f87171">{{DOWN_MINS}}</div><div class="lbl">DOWN</div></div>
+  <div class="card"><div class="val" style="color:#fbbf24">{{UNCLEAR_MINS}}</div><div class="lbl">UNCLEAR</div></div>
+  <div class="card"><div class="val">{{UPTIME_PCT}}</div><div class="lbl">Uptime</div></div>
+</div>
+<div class="add-row">
+  <input id="newUrl" placeholder="https://example.com" onkeydown="if(event.key==='Enter') addUrl()">
+  <button onclick="addUrl()">Add URL</button>
+</div>
+<div class="url-list">
+{{URL_ROWS}}
+</div>
+<div class="links">
+  <a href="/api/stats">JSON Stats</a> &middot;
+  <a href="/api/logs">Recent Logs</a>
+</div>
+<div id="toast" class="toast"></div>
+<script src="/js/app.js"></script>
+</body>
+</html>

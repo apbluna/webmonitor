@@ -30,8 +30,20 @@ const UNCLEAR_CODES = new Set([
   'net::ERR_CONNECTION_TIMED_OUT', 'net::ERR_CONNECTION_RESET',
 ]);
 
+const TEMPLATE_FILE = join(__dirname, '..', 'views', 'index.html');
+let pageTemplate = '';
+
 const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+
+function loadTemplate(): string {
+  try {
+    return readFileSync(TEMPLATE_FILE, 'utf-8');
+  } catch {
+    console.error('Template not found at ' + TEMPLATE_FILE);
+    process.exit(1);
+  }
+}
 
 function readUrls(): string[] {
   if (!existsSync(URLS_FILE)) return [];
@@ -229,6 +241,7 @@ async function runCheck(urls: string[]) {
 }
 
 function startServer() {
+  pageTemplate = loadTemplate();
   const app = express();
   app.use(express.json());
   app.use(express.static(join(__dirname, '..', 'public')));
@@ -306,39 +319,19 @@ function startServer() {
         }).join('')
       : '<p style="color:#64748b;text-align:center">No URLs configured</p>';
 
-    res.send(`<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Uptime Monitor</title>
-<link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-<h1>Uptime Monitor</h1>
-<p style="color:#64748b">Last checked: ${stats.lastChecked} &middot; <span class="status-badge status-${stats.overallStatus === 'ALL UP' ? 'up' : stats.overallStatus === 'ALL DOWN' ? 'down' : 'warning'}">${stats.overallStatus}</span></p>
-<div class="stats">
-  <div class="card"><div class="val">${stats.global.totalMins}</div><div class="lbl">Total Checks</div></div>
-  <div class="card"><div class="val" style="color:#4ade80">${stats.global.upMins}</div><div class="lbl">UP</div></div>
-  <div class="card"><div class="val" style="color:#f87171">${stats.global.downMins}</div><div class="lbl">DOWN</div></div>
-  <div class="card"><div class="val" style="color:#fbbf24">${stats.global.unclearMins}</div><div class="lbl">UNCLEAR</div></div>
-  <div class="card"><div class="val">${stats.global.uptimePct}</div><div class="lbl">Uptime</div></div>
-</div>
-<div class="add-row">
-  <input id="newUrl" placeholder="https://example.com" onkeydown="if(event.key==='Enter') addUrl()">
-  <button onclick="addUrl()">Add URL</button>
-</div>
-<div class="url-list">
-${urlRows}
-</div>
-<div class="links">
-  <a href="/api/stats">JSON Stats</a> &middot;
-  <a href="/api/logs">Recent Logs</a>
-</div>
-<div id="toast" class="toast"></div>
-<script src="/js/app.js"></script>
-</body>
-</html>`);
+    const statusClass = stats.overallStatus === 'ALL UP' ? 'up' : stats.overallStatus === 'ALL DOWN' ? 'down' : 'warning';
+    res.send(
+      pageTemplate
+        .replace('{{LAST_CHECKED}}', stats.lastChecked)
+        .replace('{{STATUS_CLASS}}', statusClass)
+        .replace('{{OVERALL_STATUS}}', stats.overallStatus)
+        .replace('{{TOTAL_MINS}}', String(stats.global.totalMins))
+        .replace('{{UP_MINS}}', String(stats.global.upMins))
+        .replace('{{DOWN_MINS}}', String(stats.global.downMins))
+        .replace('{{UNCLEAR_MINS}}', String(stats.global.unclearMins))
+        .replace('{{UPTIME_PCT}}', stats.global.uptimePct)
+        .replace('{{URL_ROWS}}', urlRows)
+    );
   });
 
   app.get('/api/stats', (_req, res) => {
