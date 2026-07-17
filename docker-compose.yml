@@ -2,6 +2,8 @@ services:
   uptime-monitor:
     build: .
     container_name: uptime-monitor
+    environment:
+      - TZ=Asia/Manila
     volumes:
       - /opt/monitor:/app/data
     networks:
