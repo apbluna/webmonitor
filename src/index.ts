@@ -1,8 +1,10 @@
-import express from 'express';
+import express, { type Request, type Response, type NextFunction } from 'express';
 import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
+process.setMaxListeners(20);
 
 puppeteer.use(StealthPlugin());
 
@@ -243,8 +245,29 @@ async function runCheck(urls: string[]) {
 function startServer() {
   pageTemplate = loadTemplate();
   const app = express();
-  app.use(express.json());
-  app.use(express.static(join(__dirname, '..', 'public')));
+  app.use(express.json({ limit: '1kb' }));
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+    next();
+  });
+  app.use(express.static(join(__dirname, '..', 'public'), {
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=3600, no-transform');
+    },
+  }));
 
   app.get('/', (_req, res) => {
     let stats: Stats;
