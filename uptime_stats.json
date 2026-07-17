@@ -1,30 +1,78 @@
 {
   "perUrl": {
+    "https://guides.bloombergconnects.org/en-US/guide/filipinasHeritageLibrary": {
+      "total": 113,
+      "up": 113,
+      "down": 0,
+      "unclear": 0,
+      "uptimePct": "100.00%"
+    },
     "https://opac.filipinaslibrary.org.ph/": {
-      "total": 4098,
-      "up": 4087,
-      "down": 11,
-      "uptimePct": "99.73%"
+      "total": 133424,
+      "up": 132733,
+      "down": 690,
+      "unclear": 1,
+      "uptimePct": "99.48%"
     },
     "https://www.filipinaslibrary.org.ph/": {
-      "total": 4094,
-      "up": 3926,
-      "down": 168,
-      "uptimePct": "95.90%"
-    },
+      "total": 133424,
+      "up": 132734,
+      "down": 690,
+      "unclear": 0,
+      "uptimePct": "99.48%"
+    }
+  },
+  "perUrlCodes": {
     "https://guides.bloombergconnects.org/en-US/guide/filipinasHeritageLibrary": {
-      "total": 11,
-      "up": 11,
-      "down": 0,
-      "uptimePct": "100.00%"
+      "200": [
+        {
+          "status": "UP",
+          "count": 113
+        }
+      ]
+    },
+    "https://opac.filipinaslibrary.org.ph/": {
+      "200": [
+        {
+          "status": "UP",
+          "count": 132733
+        }
+      ],
+      "502": [
+        {
+          "status": "DOWN",
+          "count": 690
+        }
+      ],
+      "Timeout": [
+        {
+          "status": "UNCLEAR",
+          "count": 1
+        }
+      ]
+    },
+    "https://www.filipinaslibrary.org.ph/": {
+      "200": [
+        {
+          "status": "UP",
+          "count": 132734
+        }
+      ],
+      "502": [
+        {
+          "status": "DOWN",
+          "count": 690
+        }
+      ]
     }
   },
   "global": {
-    "totalMins": 8203,
-    "upMins": 8024,
-    "downMins": 179,
-    "uptimePct": "97.82%"
+    "totalMins": 266960,
+    "upMins": 265580,
+    "downMins": 1380,
+    "unclearMins": 1,
+    "uptimePct": "99.48%"
   },
-  "lastChecked": "7/17/2026, 10:15:41",
+  "lastChecked": "7/17/2026, 13:41:58",
   "overallStatus": "SOME DOWN"
 }
